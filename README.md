@@ -1,85 +1,158 @@
 <div align="center">
-  <h1><img src="https://gocart-gs.vercel.app/favicon.ico" width="20" height="20" alt="GoCart Favicon">
-   GoCart</h1>
+  <h1>🛒 GoCart - Multi-Vendor E-Commerce Platform</h1>
   <p>
-    An open-source multi-vendor e-commerce platform built with Next.js and Tailwind CSS.
-  </p>
-  <p>
-    <a href="https://github.com/GreatStackDev/goCart/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/GreatStackDev/goCart?style=for-the-badge" alt="License"></a>
-    <a href="https://github.com/GreatStackDev/goCart/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome"></a>
-    <a href="https://github.com/GreatStackDev/goCart/issues"><img src="https://img.shields.io/github/issues/GreatStackDev/goCart?style=for-the-badge" alt="GitHub issues"></a>
+    Full-stack, multi-tier architecture with Next.js Frontend, Node.js/Express Backend, and PostgreSQL Database via Prisma ORM.
   </p>
 </div>
 
 ---
 
-## 📖 Table of Contents
+## 🏛️ System Architecture
 
-- [✨ Features](#-features)
-- [🛠️ Tech Stack](#-tech-stack)
-- [🚀 Getting Started](#-getting-started)
-- [🤝 Contributing](#-contributing)
-- [📜 License](#-license)
+```
+gocart/
+├── frontend/                     # Next.js 15 Client Application
+│   ├── app/                      # Next.js App Router (Public, Vendor, Admin)
+│   ├── components/               # UI Components
+│   ├── lib/                      # Redux Store & Slices
+│   ├── assets/                   # Static Media & Icons
+│   ├── Dockerfile                # Frontend Containerfile
+│   └── package.json
+│
+├── backend/                      # Node.js + Express REST API Service
+│   ├── prisma/
+│   │   ├── schema.prisma         # PostgreSQL Prisma Schema
+│   │   └── seed.js               # Database Seeding Script
+│   ├── src/
+│   │   ├── config/               # Database Singleton Connection
+│   │   ├── controllers/          # Business Logic & CRUD Handlers
+│   │   ├── middlewares/          # Logger & Global Error Handlers
+│   │   ├── routes/               # Modular REST Endpoints
+│   │   └── server.js             # Express Server & Probes
+│   ├── Dockerfile                # Backend Containerfile
+│   ├── README.md                 # Detailed API Documentation
+│   └── package.json
+│
+├── docker-compose.yml            # Complete Orchestration (Frontend + Backend + PostgreSQL)
+├── .env.example                  # Environment Template
+└── README.md                     # Root Documentation
+```
 
 ---
 
-## Features
+## 🛠️ Tech Stack
 
-- **Multi-Vendor Architecture:** Allows multiple vendors to register, manage their own products, and sell on a single platform.
-- **Customer-Facing Storefront:** A beautiful and responsive user interface for customers to browse and purchase products.
-- **Vendor Dashboards:** Dedicated dashboards for vendors to manage products, view sales analytics, and track orders.
-- **Admin Panel:** A comprehensive dashboard for platform administrators to oversee vendors, products, and commissions.
+| Layer | Technology | Description |
+| :--- | :--- | :--- |
+| **Frontend** | Next.js 15, React 19, Tailwind CSS | Responsive storefront, seller portal, and admin dashboard |
+| **Backend** | Node.js, Express.js, Helmet, CORS | RESTful API service with structured error handling & logging |
+| **Database** | PostgreSQL 16, Prisma ORM | Relational database with automated migrations & seeding |
+| **DevOps** | Docker, Docker Compose | Multi-container orchestration with health checks and volume persistence |
 
-## 🛠️ Tech Stack <a name="-tech-stack"></a>
+---
 
-- **Framework:** Next.js
-- **Styling:** Tailwind CSS
-- **UI Components:** Lucide React for icons
-- **State Management:** Redux Toolkit
+## 🚀 DevOps Hands-On: Quick Start with Docker Compose
 
-## 🚀 Getting Started <a name="-getting-started"></a>
+Ensure Docker and Docker Compose are installed and running.
 
-First, install the dependencies. We recommend using `npm` for this project.
-
+### 1. Start All Services
 ```bash
+docker compose up --build -d
+```
+
+This launches:
+1. `gocart-postgres` on port `5432` with automated health checks (`pg_isready`)
+2. `gocart-backend` on port `5000` (starts once PostgreSQL is healthy)
+3. `gocart-frontend` on port `3000`
+
+### 2. Run Database Migrations & Seed Initial Data
+```bash
+# Push schema to PostgreSQL container:
+docker compose exec backend npm run db:push
+
+# Seed demo users, products, stores, coupons, and orders:
+docker compose exec backend npm run db:seed
+```
+
+### 3. Verify Health Probes
+```bash
+# Check backend and database connectivity:
+curl http://localhost:5000/api/health
+```
+
+### 4. Stop Services
+```bash
+docker compose down
+# Or to clear persistent database volume:
+docker compose down -v
+```
+
+---
+
+## 💻 Local Development (Without Docker)
+
+### Prerequisites
+- Node.js (v20+)
+- PostgreSQL server running locally on port `5432` with a database named `gocart`
+
+### 1. Setup Backend & PostgreSQL
+```bash
+cd backend
+
+# Install dependencies
 npm install
-```
 
-Then, run the development server:
+# Copy environment variables
+cp .env.example .env
 
-```bash
+# Generate Prisma Client
+npm run db:generate
+
+# Push schema to PostgreSQL
+npm run db:push
+
+# Seed initial data
+npm run db:seed
+
+# Start backend dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+Backend will be live at `http://localhost:5000`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Setup Frontend
+```bash
+cd ../frontend
 
-You can start editing the page by modifying `app/(public)/page.js`. The page auto-updates as you edit the file.
+# Install dependencies
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Outfit](https://vercel.com/font), a new font family for Vercel.
+# Start Next.js development server
+npm run dev
+```
+Frontend will be live at `http://localhost:3000`.
 
 ---
 
-## 🤝 Contributing <a name="-contributing"></a>
+## 🔌 API Endpoints Summary
 
-We welcome contributions! Please see our [CONTRIBUTING.md](./CONTRIBUTING.md) for more details on how to get started.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/health` | Service health status and PostgreSQL connection ping |
+| `POST` | `/api/auth/register` | Register / sync user profile |
+| `GET` | `/api/products` | Query products by category, keyword, stock, price sort |
+| `POST` | `/api/products` | Create a new vendor product |
+| `GET` | `/api/stores` | List stores (approved or pending review) |
+| `POST` | `/api/stores` | Register a new seller store |
+| `PATCH` | `/api/stores/:id/status` | Admin approve or reject seller store |
+| `POST` | `/api/orders` | Place order with items and delivery address |
+| `GET` | `/api/orders/user/:userId` | Customer order history |
+| `GET` | `/api/orders/store/:storeId`| Vendor orders received |
+| `POST` | `/api/coupons/validate` | Verify coupon validity and discounts |
+| `GET` | `/api/admin/dashboard` | Platform metrics (revenue, stores, orders, products) |
+
+*For complete API parameters and payload structures, see [`backend/README.md`](./backend/README.md).*
 
 ---
 
-## 📜 License <a name="-license"></a>
-
-This project is licensed under the MIT License. See the [LICENSE.md](./LICENSE.md) file for details.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📜 License
+MIT License.
