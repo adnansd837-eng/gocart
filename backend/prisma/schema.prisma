@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  image     String?  @default("")
+  role      String   @default("user") // "user" | "admin" | "seller"
+  cart      Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ratings     Rating[]
+  addresses   Address[]
+  store       Store?
+  buyerOrders Order[]   @relation("BuyerRelation")
+
+  @@map("users")
+}
+
+model Store {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  name        String
+  description String
+  username    String   @unique
+  address     String
+  status      String   @default("pending") // "pending" | "approved" | "rejected"
+  isActive    Boolean  @default(false)
+  logo        String
+  email       String
+  contact     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+  orders   Order[]
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("stores")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  mrp         Float
+  price       Float
+  images      String[]
+  category    String
+  inStock     Boolean  @default(true)
+  storeId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  store      Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+  ratings    Rating[]
+
+  @@map("products")
+}
+
+enum OrderStatus {
+  ORDER_PLACED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+}
+
+enum PaymentMethod {
+  COD
+  STRIPE
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  total         Float
+  status        OrderStatus   @default(ORDER_PLACED)
+  userId        String
+  storeId       String
+  addressId     String
+  isPaid        Boolean       @default(false)
+  paymentMethod PaymentMethod @default(COD)
+  isCouponUsed  Boolean       @default(false)
+  coupon        Json          @default("{}")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user       User        @relation("BuyerRelation", fields: [userId], references: [id])
+  store      Store       @relation(fields: [storeId], references: [id])
+  address    Address     @relation(fields: [addressId], references: [id])
+  orderItems OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@id([orderId, productId])
+  @@map("order_items")
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  rating    Float
+  review    String
+  userId    String
+  productId String
+  orderId   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("ratings")
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  email     String
+  street    String
+  city      String
+  state     String
+  zip       String
+  country   String
+  phone     String
+  createdAt DateTime @default(now())
+
+  orders Order[]
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+model Coupon {
+  code        String   @id
+  description String
+  discount    Float
+  forNewUser  Boolean  @default(false)
+  forMember   Boolean  @default(false)
+  isPublic    Boolean  @default(false)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@map("coupons")
+}
