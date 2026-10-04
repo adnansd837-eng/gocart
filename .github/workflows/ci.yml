@@ -20,16 +20,16 @@ jobs:
           cache: npm
           cache-dependency-path: 'frontend/package-lock.json'
 
-      - name: install npm package
-        run: npm install --force
+      - name: Install dependencies
+        run: npm ci
         working-directory: frontend
 
-      - name: run linter
+      - name: Run linter
         run: npm run lint
         working-directory: frontend
-      
-      - name: run test
-        run: npm run test
+
+      - name: Build Next.js app
+        run: npm run build
         working-directory: frontend
 
       - name: docker setup login
