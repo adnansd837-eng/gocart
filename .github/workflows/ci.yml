@@ -30,7 +30,7 @@ jobs:
 
 
       - name: Run linter
-        run: npx eslint .
+        run: npm run lint
         working-directory: ./frontend
 
       - name: Build Next.js app
