@@ -7,7 +7,7 @@ RUN apk add --no-cache openssl curl
 
 # Install dependencies first for better Docker layer caching
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 # Copy Prisma schema and generate client
 COPY prisma ./prisma/
