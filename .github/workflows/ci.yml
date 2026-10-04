@@ -21,7 +21,7 @@ jobs:
           cache-dependency-path: 'frontend/package-lock.json'
 
       - name: Install dependencies
-        run: npm install --save-dev eslint
+        run: npm install -D eslint eslint-config-next
         working-directory: frontend
 
       - name: Run linter
