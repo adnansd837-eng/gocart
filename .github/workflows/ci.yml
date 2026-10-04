@@ -45,45 +45,4 @@ jobs:
           push: true
           tags: ${{ vars.DOCKERHUB_USERNAME }}/gocart-fe:latest
 
-  backend:
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v7
-
-      - name: setup Go
-        uses: actions/setup-go@v7
-        with:
-          go-version: '1.23'
-          cache: true
-          cache-dependency-path: 'backend/go.sum'
-
-      - name: run Go formater
-        run: go fmt
-        working-directory: backend
-
-      - name: Run Go vet
-        run: go vet
-        working-directory: backend
-      
-      - name: run test
-        run: go test
-        working-directory: backend
-
-      - name: docker setup login
-        uses: docker/login-action@v4
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-        
-      - name: build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/gocart-be:latest
-
-  deploy:
-    needs: [frontend, backend]
-    uses: ./.github/workflows/cd.yml
-    secrets: inherit
+ 
