@@ -26,7 +26,7 @@ jobs:
 
       - name: Install ESLint
         working-directory: frontend
-        run: npm install -D eslint eslint-config-next
+        run: npm install 
 
 
       - name: Run linter
