@@ -157,7 +157,7 @@ Frontend will be live at `http://localhost:3000`.
 ## 📜 License
 MIT License.
 
-
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 **Phase 1 — Dockerized Application Deployment on AWS EC2**
 
 ### Objective
@@ -188,6 +188,4 @@ Deploy the GoCart e-commerce application on an AWS EC2 instance using Docker con
                 \             /
                  \           /
                   GoCart App
-
-<img width="1882" height="949" alt="Screenshot 2026-10-04 165529" src="https://github.com/user-attachments/assets/08286a3b-43c4-4cb0-85f8-21deb2bb1546" />
-
+  
