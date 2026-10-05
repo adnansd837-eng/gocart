@@ -28,6 +28,9 @@ jobs:
         run: npm run build
         working-directory: frontend
 
+      - name: next.js linter
+        run: npm run lint
+
       - name: docker setup login
         uses: docker/login-action@v4
         with:
