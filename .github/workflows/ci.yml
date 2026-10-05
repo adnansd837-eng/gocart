@@ -1,48 +1,113 @@
-name: ci
-on: 
+name: GoCart CI/CD Pipeline
+
+on:
   push:
-    # paths:
-    #   - '**'                 # Monitor all files in the repository.....
-    #   - '!.github/workflows/**'
-    branches: [main]
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   frontend:
+    name: Frontend Lint, Test & Build
     runs-on: ubuntu-latest
     steps:
-      - name: checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: setup Node.job
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
           cache-dependency-path: 'frontend/package-lock.json'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install Dependencies
         working-directory: ./frontend
+        run: npm ci
 
-      - name: Build Next.js app
-        run: npm run build
-        working-directory: frontend
-
-      - name: next.js linter
+      - name: Next.js Linter
+        working-directory: ./frontend
         run: npm run lint
-        working-directory: frontend
 
-      - name: docker setup login
+      - name: Run Tests
+        working-directory: ./frontend
+        run: npm test
+
+      - name: Build Next.js App
+        working-directory: ./frontend
+        run: npm run build
+        env:
+          NEXT_PUBLIC_CURRENCY_SYMBOL: '$'
+          NEXT_PUBLIC_API_URL: 'http://localhost:5000/api'
+
+      - name: Docker Setup Login (Optional / if secrets set)
+        if: ${{ env.DOCKERHUB_USER != '' && env.DOCKERHUB_PASS != '' }}
         uses: docker/login-action@v4
+        env:
+          DOCKERHUB_USER: ${{ vars.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-        
-      - name: build and push
+
+      - name: Build and Push Frontend Image
+        if: ${{ env.DOCKERHUB_USER != '' && env.DOCKERHUB_PASS != '' }}
         uses: docker/build-push-action@v5
+        env:
+          DOCKERHUB_USER: ${{ vars.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
         with:
           context: ./frontend
           push: true
           tags: ${{ vars.DOCKERHUB_USERNAME }}/gocart-fe:latest
 
- 
+  backend:
+    name: Backend Lint, Test & Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: 'backend/package-lock.json'
+
+      - name: Install Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Generate Prisma Client
+        working-directory: ./backend
+        run: npm run db:generate
+
+      - name: Run Backend Linter
+        working-directory: ./backend
+        run: npm run lint
+
+      - name: Run Backend Smoke Tests
+        working-directory: ./backend
+        run: npm test
+
+      - name: Docker Setup Login (Optional / if secrets set)
+        if: ${{ env.DOCKERHUB_USER != '' && env.DOCKERHUB_PASS != '' }}
+        uses: docker/login-action@v4
+        env:
+          DOCKERHUB_USER: ${{ vars.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Backend Image
+        if: ${{ env.DOCKERHUB_USER != '' && env.DOCKERHUB_PASS != '' }}
+        uses: docker/build-push-action@v5
+        env:
+          DOCKERHUB_USER: ${{ vars.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/gocart-be:latest

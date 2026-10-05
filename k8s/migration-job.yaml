@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gocart-db-migration
+  labels:
+    app: gocart-migration
+spec:
+  template:
+    metadata:
+      labels:
+        app: gocart-migration
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: db-migrate
+          image: gocart-backend:latest
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c", "npx prisma db push && node prisma/seed.js"]
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: gocart-secrets
+                  key: DATABASE_URL

@@ -1,0 +1,38 @@
+{
+  "name": "gocart-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GoCart Full-Stack E-Commerce Platform Orchestrator",
+  "scripts": {
+    "install:all": "npm --prefix frontend install && npm --prefix backend install",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "npm --prefix frontend run lint",
+    "lint:backend": "npm --prefix backend run lint",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "npm --prefix frontend test",
+    "test:backend": "npm --prefix backend test",
+    "build": "npm run build:frontend",
+    "build:frontend": "npm --prefix frontend run build",
+    "docker:up": "docker compose up --build -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "db:push": "npm --prefix backend run db:push",
+    "db:migrate": "npm --prefix backend run db:migrate:deploy",
+    "db:seed": "npm --prefix backend run db:seed"
+  },
+  "keywords": [
+    "gocart",
+    "ecommerce",
+    "nextjs",
+    "express",
+    "postgresql",
+    "prisma",
+    "devops",
+    "cicd",
+    "kubernetes",
+    "terraform",
+    "ansible"
+  ],
+  "author": "",
+  "license": "MIT"
+}
