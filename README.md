@@ -156,3 +156,38 @@ Frontend will be live at `http://localhost:3000`.
 
 ## 📜 License
 MIT License.
+
+
+**Phase 1 — Dockerized Application Deployment on AWS EC2**
+
+### Objective
+Deploy the GoCart e-commerce application on an AWS EC2 instance using Docker containers.
+
+### Implementation
+
+- Created separate Docker images for the **Frontend** and **Backend** applications.
+- Configured the application services using **Docker Compose**.
+- Provisioned an **AWS EC2 instance** as the deployment server.
+- Pulled/built the required Docker images on the EC2 instance.
+- Started the frontend and backend services using Docker Compose.
+- Exposed the application through the EC2 instance's public IP and configured application access on port `3000`.
+
+### Deployment Architecture
+
+```text
+                 AWS EC2 Instance
+                       |
+                Docker Compose
+                 /           \
+                /             \
+       Frontend Container   Backend Container
+             |                    |
+       Docker Image          Docker Image
+             |                    |
+          Port 3000          Backend API
+                \             /
+                 \           /
+                  GoCart App
+
+<img width="1882" height="949" alt="Screenshot 2026-10-04 165529" src="https://github.com/user-attachments/assets/08286a3b-43c4-4cb0-85f8-21deb2bb1546" />
+
