@@ -1,4 +1,4 @@
-name: GoCart CI/CD Pipeline
+name: GoCart CI/CD Pipeline #name of the workflow
 
 on:
   push:
