@@ -1,4 +1,4 @@
-#the goal is Build, Test, Deploy the workflows
+#the goal is Build, Test, Deploy the workflows..
 
 name: GoCart CI/CD Pipeline #name of the workflow..
 
